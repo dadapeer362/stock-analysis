@@ -1,7 +1,5 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import bcrypt from 'bcrypt';
-import { prisma } from './prisma';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -16,33 +14,18 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // For personal use, check against env variables first
+        // Simple environment variable authentication (no database needed)
         const adminUsername = process.env.ADMIN_USERNAME;
         const adminPassword = process.env.ADMIN_PASSWORD;
 
+        // Direct comparison (for personal use)
         if (
           credentials.username === adminUsername &&
           credentials.password === adminPassword
         ) {
-          // Check if user exists in database
-          let user = await prisma.user.findUnique({
-            where: { username: credentials.username }
-          });
-
-          // If not, create the user
-          if (!user) {
-            const hashedPassword = await bcrypt.hash(credentials.password, 10);
-            user = await prisma.user.create({
-              data: {
-                username: credentials.username,
-                password: hashedPassword,
-              }
-            });
-          }
-
           return {
-            id: user.id,
-            name: user.username,
+            id: '1',
+            name: credentials.username,
           };
         }
 

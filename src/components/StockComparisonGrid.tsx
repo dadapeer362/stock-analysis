@@ -10,17 +10,6 @@ interface StockComparisonGridProps {
 }
 
 export default function StockComparisonGrid({ recommendations, searchedStock }: StockComparisonGridProps) {
-  const getActionColor = (action: 'BUY' | 'SELL' | 'HOLD') => {
-    switch (action) {
-      case 'BUY':
-        return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'SELL':
-        return 'bg-red-500/20 text-red-400 border-red-500/30';
-      case 'HOLD':
-        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-    }
-  };
-
   const getRatingBadgeColor = (rating: string) => {
     switch (rating) {
       case 'STRONG_BUY':
@@ -120,8 +109,8 @@ export default function StockComparisonGrid({ recommendations, searchedStock }: 
       {/* Financial Terms Glossary */}
       <details className="group bg-slate-800/60 border border-slate-700/50 rounded-lg">
         <summary className="cursor-pointer px-4 py-3 font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">
-          <span className="group-open:hidden">📖 Show Financial Terms Guide</span>
-          <span className="hidden group-open:inline">📖 Hide Financial Terms Guide</span>
+          <span className="group-open:hidden">▶ Show Financial Terms Guide</span>
+          <span className="hidden group-open:inline">▼ Hide Financial Terms Guide</span>
         </summary>
         <div className="px-4 pb-4 pt-2 space-y-3 text-sm">
           <div className="grid md:grid-cols-2 gap-3">
@@ -261,8 +250,8 @@ export default function StockComparisonGrid({ recommendations, searchedStock }: 
       {/* Scoring Methodology */}
       <details className="group bg-gradient-to-r from-blue-900/40 to-purple-900/40 border-2 border-blue-700/50 rounded-lg">
         <summary className="cursor-pointer px-4 py-3 font-semibold text-blue-200 hover:text-white hover:bg-blue-900/30 transition-colors">
-          <span className="group-open:hidden">🎯 How We Score Stocks (Our Methodology)</span>
-          <span className="hidden group-open:inline">🎯 Hide Scoring Methodology</span>
+          <span className="group-open:hidden">▶ How We Score Stocks (Our Methodology)</span>
+          <span className="hidden group-open:inline">▼ Hide Scoring Methodology</span>
         </summary>
         <div className="px-4 pb-4 pt-2 space-y-4 text-sm">
           
@@ -633,35 +622,16 @@ export default function StockComparisonGrid({ recommendations, searchedStock }: 
                   </div>
                 )}
 
-                {/* CAN I BUY TODAY? - Decision Card */}
-                {stock.score.buyDecision && (
-                  <div className={`mt-3 p-4 rounded-lg border-2 ${
-                    stock.score.buyDecision.canBuyToday 
-                      ? 'bg-gradient-to-r from-green-900/40 to-emerald-900/40 border-green-600/60' 
-                      : 'bg-gradient-to-r from-orange-900/40 to-red-900/40 border-orange-600/60'
-                  }`}>
-                    <div className="flex items-start gap-3 mb-3">
-                      <div className={`text-3xl ${stock.score.buyDecision.canBuyToday ? 'text-green-400' : 'text-orange-400'}`}>
-                        {stock.score.buyDecision.canBuyToday ? '✅' : '⏸️'}
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-sm font-bold text-white mb-1">Can I Buy Today?</div>
-                        <div className={`text-base font-semibold mb-2 ${
-                          stock.score.buyDecision.canBuyToday ? 'text-green-300' : 'text-orange-300'
-                        }`}>
-                          {stock.score.buyDecision.canBuyToday ? 'Yes' : 'No'}
-                        </div>
-                        <div className="text-xs text-slate-200 italic">"{stock.score.buyDecision.recommendation}"</div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
+                {/* Positives & Negatives */}
+                {stock.score.buyDecision && (stock.score.buyDecision.reasons.positive.length > 0 || stock.score.buyDecision.reasons.negative.length > 0) && (
+                  <div className="mt-3 p-4 bg-gradient-to-r from-slate-900/60 to-slate-800/60 rounded-lg border border-slate-700/50">
+                    <div className="space-y-3">
                       {stock.score.buyDecision.reasons.positive.length > 0 && (
                         <div>
-                          <div className="text-xs font-semibold text-green-300 mb-1">✓ Positives:</div>
-                          <div className="space-y-0.5">
+                          <div className="text-sm font-semibold text-green-300 mb-2">✓ Positives</div>
+                          <div className="space-y-1">
                             {stock.score.buyDecision.reasons.positive.map((reason, idx) => (
-                              <div key={idx} className="text-xs text-green-100 flex items-start gap-1">
+                              <div key={idx} className="text-sm text-green-100 flex items-start gap-2">
                                 <span className="text-green-400 mt-0.5">•</span>
                                 <span>{reason}</span>
                               </div>
@@ -672,10 +642,10 @@ export default function StockComparisonGrid({ recommendations, searchedStock }: 
                       
                       {stock.score.buyDecision.reasons.negative.length > 0 && (
                         <div>
-                          <div className="text-xs font-semibold text-red-300 mb-1">✗ Negatives:</div>
-                          <div className="space-y-0.5">
+                          <div className="text-sm font-semibold text-red-300 mb-2">✗ Negatives</div>
+                          <div className="space-y-1">
                             {stock.score.buyDecision.reasons.negative.map((reason, idx) => (
-                              <div key={idx} className="text-xs text-red-100 flex items-start gap-1">
+                              <div key={idx} className="text-sm text-red-100 flex items-start gap-2">
                                 <span className="text-red-400 mt-0.5">•</span>
                                 <span>{reason}</span>
                               </div>
@@ -1093,11 +1063,13 @@ export default function StockComparisonGrid({ recommendations, searchedStock }: 
                 </details>
               )}
 
-              {/* Action Badge */}
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border font-semibold mb-4 ${getActionColor(stock.action)}`}>
-                <span className="text-lg">{stock.action}</span>
-              </div>
-
+              {/* Collapsible Detailed Information */}
+              <details className="group mb-4">
+                <summary className="cursor-pointer px-4 py-3 bg-gradient-to-r from-indigo-900/40 to-purple-900/40 hover:from-indigo-800/50 hover:to-purple-800/50 border border-indigo-700/40 hover:border-indigo-600/60 rounded-lg transition-all font-semibold text-indigo-200 hover:text-indigo-100">
+                  <span className="group-open:hidden">▶ Show Detailed Analysis</span>
+                  <span className="hidden group-open:inline">▼ Hide Detailed Analysis</span>
+                </summary>
+                <div className="mt-4 space-y-4">
               {/* Entry Point Info */}
               <div className="mb-4 p-3 bg-cyan-950/40 border border-cyan-700/40 rounded-lg">
                 <div className="text-sm font-semibold text-cyan-200 mb-3">💰 Entry Strategies</div>
@@ -1232,6 +1204,8 @@ export default function StockComparisonGrid({ recommendations, searchedStock }: 
                   </ul>
                 </div>
               )}
+                </div>
+              </details>
             </div>
           );
         })}
